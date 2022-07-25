@@ -67,7 +67,7 @@ function Invoke-Vulcan {
         $LPORT = $match.matches.groups[1].Value
         
         Resolve-Path `
-            -Path $(Join-Path -Path $OutputDirectory "$($Payload.Replace('/', '-')).${LHOST}-${LPORT}.$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).doc") `
+            -Path $(Join-Path -Path $OutputDirectory "$($Payload.Replace('/', '.')).${LHOST}-${LPORT}.$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).doc") `
             -ErrorAction SilentlyContinue -ErrorVariable _frperror
 
         $WordOutput = $_frperror[0].TargetObject
