@@ -1,6 +1,6 @@
 # vulcan
 
-[![Language](https://img.shields.io/badge/Lang-powershell-blue.svg)](https://docs.microsoft.com/en-gb/powershell/)
+[![Language](https://img.shields.io/badge/Lang-PowerShell-blue.svg)](https://docs.microsoft.com/en-gb/powershell/)
 [![License](https://img.shields.io/badge/License-BSD%203-red.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 ## A collection of `PowerShell` script to simplify everyday phishing. 🎣
