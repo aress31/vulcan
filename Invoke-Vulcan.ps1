@@ -110,11 +110,14 @@ function Create_WordDocument($BAMOutput, $Output) {
     Write-Host "[i] Creating macro-enabled Word document..."
     $Word = New-Object -ComObject Word.Application
     $Doc = $Word.Documents.Add()
-    $VBComp = $Doc.VBProject.VBComponents.Add(1)
-    $VBAMacro = Get-Content -Path $BAMOutput
-    $VBComp.CodeModule.AddFromString($VBAMacro)
+
+    $DocModule = $Doc.VBProject.VBComponents.Add(1)
+    $Macro = Get-Content -Path $BAMOutput
+    $DocModule.CodeModule.AddFromString($Macro)
 
     Write-Host "[+] Word document written to: $Output" 
-    $Doc.SaveAs($Output)
+    $Doc.SaveAs($Output, 0)
+
     $Doc.Close()
+    $Word.Quit()
 }
