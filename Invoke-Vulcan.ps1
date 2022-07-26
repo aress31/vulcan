@@ -58,7 +58,7 @@ function Invoke-Vulcan {
     )
 
     begin {
-        $PayloadOutput = "${env:TEMP}\msfvenom_$(Get-Date -Format yyyy-MM-dd_hh_mm_ss).raw.txt"
+        $PayloadOutput = "${env:TEMP}\msfvenom_$(Get-Date -Format yyyy-MM-dd_hh_mm_ss).bin"
         $BAMOutput = "${env:TEMP}\badassmacros_$(Get-Date -Format yyyy-MM-dd_hh_mm_ss).vba"
         
         $Match = $payloadOptions | Select-String -Pattern "LHOST=(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})"
