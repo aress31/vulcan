@@ -108,7 +108,6 @@ function Create_VBAMacro($BAMBin, $BAMInput, $BAMOutput) {
     $CaesarShift = Get-Random -Minimum 1 -Maximum 25
     $Command = "$BAMBin -w doc -p no -s indirect -c $CaesarShift -i $BAMInput -o $BAMOutput"
 
-    
     Write-Host "[i] Running command: $Command"
     Invoke-Expression -Command $Command | Out-Null
     Write-Host "[i] VBA macro written to: $BAMOutput"
