@@ -3,13 +3,13 @@
 [![Language](https://img.shields.io/badge/Lang-PowerShell-blue.svg)](https://docs.microsoft.com/en-gb/powershell/)
 [![License](https://img.shields.io/badge/License-BSD%203-red.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-## A `PowerShell` script that simplify life and therefore phishing. 🎣
+## A `PowerShell` script that simplifies life and therefore... phishing. 🎣
 
 A `PowerShell` script to automate the creation of consitent and efficient macro-enabled `Word` documents. At the time of writing, the `indirect` template yields great results at evading most AVs, including `Windows Defender`. This script is a wrapper around [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/) - made possible thanks to [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) that use templates to create `Word` implant with a one-liner.
 
 The community is greatly encourage toward building and improving upon the existing features. 🐺
 
-### ⚠️ Do not submit the produced files to VirusTotal.
+### ⚠️ Do not be a dummy... Do not submit the produced implants to VirusTotal. 🤢
 
 ## Features
 
