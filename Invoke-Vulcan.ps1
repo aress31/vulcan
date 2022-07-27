@@ -59,7 +59,6 @@ function Invoke-Vulcan {
         [String]
         $Template,
         
-        [Parameter(Mandatory)]
         [int]
         $Treshold = 72
     )
