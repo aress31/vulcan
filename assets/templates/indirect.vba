@@ -11,6 +11,7 @@ Private VType(0 To 63) As Integer, VPtr(0 To 63) As Long
 Function NTj()
     Dim EOu As Long
     Dim ETC As Long
+    Dim HoR() As Variant
 
     HoR = PAYLOAD
 

