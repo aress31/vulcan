@@ -112,7 +112,7 @@ Please submit all `PRs` on the GitHub [pull requests tracker](https://github.com
 
 ## Acknowledgements
 
-Give to Caesar what belongs to Caesar:
+Give to Caesar (no pun intended 🙄) what belongs to Caesar:
 
 - [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/)
 
