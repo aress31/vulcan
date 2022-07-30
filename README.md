@@ -7,7 +7,7 @@
 
 A `PowerShell` script to automate the creation of consitent and efficient macro-enabled `Word` documents. At the time of writing, the `indirect` template yields great results at evading most AVs, including `Windows Defender` in some cases.
 
-This `PowerShell` script is can be viewed as a third-party add-on to [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/) - made possible thanks to [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) - that leverage templates to quickly and easily - *encoded* - create `Word` implants.
+This `PowerShell` script can be viewed as *kind of* a third-party add-on to [MSFVenom](https://www.offensive-security.com/metasploit-unleashed/msfvenom/) - made possible thanks to [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) - that leverage templates to quickly and easily - *encoded* - create `Word` implants.
 
 Users/stargazers are greatly encouraged toward contributing to improving and extending this project. 🐺
 
