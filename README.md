@@ -52,7 +52,7 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 `Get-Help -Name Invoke-Vulcan` is your friend... Your best friend is `Get-Help -Name Invoke-Vulcan -Detailed`. Nonetheless, `Invoke-Vulcan` must be fed a `hex`-formatted shellcode. This can be achieved with:
 
 ```powershell
-    Get-Content $ShellCode -AsByteStream -Raw | Invoke-Vulcan ...
+    Get-Content -Path $ShellCode -AsByteStream -Raw | Invoke-Vulcan ...
 ```
 
 ```powershell
