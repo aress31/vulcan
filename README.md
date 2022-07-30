@@ -17,7 +17,7 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 
 - `Visual Basic` templating (`.\assets\templates`) -> **do not hesitate to submit new templates**.
 - Decoding routines/functions (`.\assets\decoders`) -> **do not hesitate to submit new templates**.
-- Fine-tuning of *bloody* `Visual Basic` line-continuation using `-Treshold`.
+- Work-around `Visual Basic` line-continuation limitations using `-Treshold`.
 
 ## Requirements
 
