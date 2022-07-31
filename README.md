@@ -91,6 +91,8 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
         Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -Key "Star&WatchThisRepository" -Verbose
     ```
 
+    ![name](./videos/pwsh%20in%20vulcan%202022-07-31%2004-20-56.mp4)
+
     > [!WARNING]
     > The length of the key must be shorted than the shellcode.
 
