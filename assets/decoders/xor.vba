@@ -1,3 +1,4 @@
+
 Public Function kUG(ByRef srK() As Variant, kAm As String)
     For i = 0 To UBound(srK)
         j = i Mod Len(kAm)

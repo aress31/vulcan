@@ -1,7 +1,7 @@
-function Invoke-XOR {
+function Invoke-Ceasar {
     <#
     .SYNOPSIS
-        An implementation of the XOR algorithm.
+        An implementation of the Caesar shift cipher algorithm.
 
         Author: Alexandre Teyar (@aress31)
         License: BSD 3-Clause
@@ -9,31 +9,38 @@ function Invoke-XOR {
         Optional Dependencies: None
 
     .DESCRIPTION
-        An implementation of the XOR algorithm.
+        An implementation of the Caesar shift cipher algorithm.
+
+    .PARAMETER Operation
+        Specifies the operation to perform, i.e., encode or decode.
 
     .PARAMETER Key
-        Specifies the key/secret to use.
+        Specifies the key to use.
 
     .PARAMETER Value
         Specifies the value (hex-formatted) to encode or decode.
   
     .EXAMPLE
-        PS C:\> cat payload.hex | Invoke-XOR -Operation encode -Shift 3
+        PS C:\> cat payload.hex | Invoke-Caesar -Operation encode -Key 3
 
-        Encode payload.hex using the key of 3.
+        Encode payload.hex using the Caesar shift cipher with a Key value of 3.
 
-        PS C:\> cat payload.enc.hex | Invoke-Caesar -Operation decode -Shift 3
+        PS C:\> cat payload.enc.hex | Invoke-Caesar -Operation decode -Key 3
 
-        Decode payload.enc.hex using the Caesar Shift cipher with a shift value of 3.
+        Decode payload.enc.hex using the Caesar shift cipher with a Key value of 3.
     #>
     
     [CmdletBinding(PositionalBinding = $False)]
     [OutputType([String])]
     Param
     (
-        [Parameter(Mandatory)]
+        [ValidateSet("decode", "encode")]
         [string]
-        $Key,
+        $Operation = "encode",
+
+        [ValidateRange(0, 255)]
+        [int]
+        $Key = 1,
 
         [Parameter(Mandatory, ValueFromPipeline)]
         [string]
@@ -47,8 +54,13 @@ function Invoke-XOR {
 
     Write-Debug "Bytes: $Bytes"
 
-    for ($i = 0; $i -lt $Bytes.Count; $i++) {
-        $TransformedBytes += $Bytes[$i] -bxor $Key[$i % $Key.Length]
+    foreach ($Byte in $Bytes) {
+        if ($Operation -eq "encode") {
+            $TransformedBytes += (($Byte + $Key) -band 255)
+        }
+        else {
+            $TransformedBytes += (($Byte - $Key) -band 255)
+        }
     }
     
     Write-Debug "TransformedBytes: $TransformedBytes"
@@ -64,10 +76,10 @@ function  Convert-BytesToHex($Value) {
 }
 
 function Convert-HexToBytes($Value) {
-    $HexArray = $Value -Split '(.{2})' -ne '' 
-    [byte[]]$Bytes = @()
+    $HexArr = $Value -Split '(.{2})' -ne '' 
+    [byte[]] $Bytes = @()
 
-    foreach ($Hex in $HexArray) {
+    foreach ($Hex in $HexArr) {
         $Bytes += [System.Convert]::ToByte($Hex, 16)
     }
 

