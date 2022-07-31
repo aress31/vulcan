@@ -150,7 +150,7 @@ function Convert-HexToBytes($Value) {
     [byte[]] $Bytes = @()
 
     foreach ($Hex in $HexArr) {
-        $Bytes += [System.Convert]::ToByte($HexArr, 16)
+        $Bytes += [System.Convert]::ToByte($Hex, 16)
     }
 
     return $Bytes
