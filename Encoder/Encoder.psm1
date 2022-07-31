@@ -1,2 +1,2 @@
-Get-ChildItem -Path $PSScriptRoot -Filter *.ps1 -File | `
-ForEach-Object { . $_.FullName }
+Get-ChildItem -Path $PSScriptRoot -File -Filter *.ps1 -Recurse | `
+    ForEach-Object { Import-Module $_.FullName }
