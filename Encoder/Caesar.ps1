@@ -1,4 +1,4 @@
-function Invoke-Ceasar {
+function Invoke-Caesar {
     <#
     .SYNOPSIS
         An implementation of the Caesar shift cipher algorithm.
@@ -31,7 +31,6 @@ function Invoke-Ceasar {
     #>
     
     [CmdletBinding(PositionalBinding = $False)]
-    [OutputType([String])]
     Param
     (
         [ValidateSet("decode", "encode")]
