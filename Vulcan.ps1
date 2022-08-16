@@ -53,6 +53,10 @@ function Invoke-Vulcan {
         [String]
         $DecoderPath,
 
+        [ValidateSet('doc', 'docm')]
+        [String]
+        $Extension = "doc",
+
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [String]
         $OutputDirectory = $(Get-Location),
@@ -74,41 +78,45 @@ function Invoke-Vulcan {
     )
 
     DynamicParam {
-        $RuntimeParameterDictionary = New-Object -Type `
-            System.Management.Automation.RuntimeDefinedParameterDictionary
-        $ParameterName = "Key"
-        $ParameterAttribute = New-Object -Type `
-            System.Management.Automation.ParameterAttribute  
-        $ParameterAttribute.Mandatory = $true
-        $AttributeCollection = New-Object -Type `
-            System.Collections.ObjectModel.Collection[System.Attribute]
-        $AttributeCollection.Add($ParameterAttribute)
+        if ($Decoder) {
+            $RuntimeParameterDictionary = New-Object -Type `
+                System.Management.Automation.RuntimeDefinedParameterDictionary
+            $ParameterName = "Key"
+            $ParameterAttribute = New-Object -Type `
+                System.Management.Automation.ParameterAttribute  
+            $ParameterAttribute.Mandatory = $true
+            $AttributeCollection = New-Object -Type `
+                System.Collections.ObjectModel.Collection[System.Attribute]
+            $AttributeCollection.Add($ParameterAttribute)
 
-        switch ($Decoder) {
-            "Caesar" {
-                $ValidateRangeAttribute = New-Object -Type `
-                    System.Management.Automation.ValidateRangeAttribute(0, 255)
-                $AttributeCollection.Add($ValidateRangeAttribute)
-                $RuntimeParameter = New-Object -Type `
-                    System.Management.Automation.RuntimeDefinedParameter($ParameterName, [int], $AttributeCollection)
+            switch ($Decoder) {
+                "Caesar" {
+                    $ValidateRangeAttribute = New-Object -Type `
+                        System.Management.Automation.ValidateRangeAttribute(0, 255)
+                    $AttributeCollection.Add($ValidateRangeAttribute)
+                    $RuntimeParameter = New-Object -Type `
+                        System.Management.Automation.RuntimeDefinedParameter($ParameterName, [int], $AttributeCollection)
 
+                }
+                "XOR" {
+                    $RuntimeParameter = New-Object -Type `
+                        System.Management.Automation.RuntimeDefinedParameter($ParameterName, [string], $AttributeCollection)
+                }
             }
-            "XOR" {
-                $RuntimeParameter = New-Object -Type `
-                    System.Management.Automation.RuntimeDefinedParameter($ParameterName, [string], $AttributeCollection)
-            }
+
+            $RuntimeParameterDictionary.Add($ParameterName, $RuntimeParameter)
+
+            return $RuntimeParameterDictionary
         }
-
-        $RuntimeParameterDictionary.Add($ParameterName, $RuntimeParameter)
-
-        return $RuntimeParameterDictionary
     }
 
     begin {
-        $Key = $PsBoundParameters[$ParameterName]
+        if ($Decoder) {
+            $Key = $PsBoundParameters[$ParameterName]
+        }
         $MacroOutput = New-TemporaryFile
         Resolve-Path `
-            -Path $(Join-Path -Path $OutputDirectory "${OutputPrefix}.$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).doc") `
+            -Path $(Join-Path -Path $OutputDirectory "${OutputPrefix}.$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).$Extension") `
             -ErrorAction SilentlyContinue -ErrorVariable _frperror
         $WordOutput = $_frperror[0].TargetObject
     }
@@ -150,7 +158,7 @@ function Convert-HexToBytes($Value) {
     [byte[]] $Bytes = @()
 
     foreach ($Hex in $HexArr) {
-        $Bytes += [System.Convert]::ToByte($HexArr, 16)
+        $Bytes += [System.Convert]::ToByte($Hex, 16)
     }
 
     return $Bytes

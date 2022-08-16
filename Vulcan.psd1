@@ -14,7 +14,7 @@
     )
     
     ModuleList        = @( 
-        @{ModuleName = 'Encoders'; ModuleVersion = '0.1.0.0'; GUID = '7cf9de61-2bwc-46b4-a397-9d7cf3a8e66b' },
+        @{ModuleName = 'Encoder'; ModuleVersion = '0.1.0.0'; GUID = '937gh27a3-q841-40d2-927a-0f09j228647x' },
         @{ModuleName = 'Utils'; ModuleVersion = '0.1.0.0'; GUID = 'a8a6280b-x694-4aa4-b28d-646afa66733c' }
     )
     

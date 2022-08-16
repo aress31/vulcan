@@ -116,6 +116,6 @@ Give to Caesar (no pun intended 🙄) what belongs to Caesar:
 
 ## License
 
-`vulcan` is primarily distributed under the terms of the `BSD 3`.
+`vulcan` is distributed under the terms of the `BSD 3`.
 
 See [LICENSE](./LICENSE) for details.
